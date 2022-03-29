@@ -54,6 +54,7 @@ def supports(rule, df):
     lhs = list(rule.lhs)
     rhs = list(rule.rhs)
     for item in df:
+        pass
     return
 
 def find_freq(df):
