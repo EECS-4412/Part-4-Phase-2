@@ -3,7 +3,7 @@ import os
 class SqlClient():
 
     def __init__(self):
-        db_path = os.environ.get("DB_PATH",  './kaggle/input/basketball/basketball.sqlite')
+        db_path = os.environ.get("DB_PATH",  './archive/basketball.sqlite')
         self.conn = sql.connect(db_path)
 
 
