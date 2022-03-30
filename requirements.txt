@@ -6,3 +6,5 @@ setuptools
 scikit-learn
 python-dotenv
 efficient-apriori
+matplotlib
+mpl_toolkits

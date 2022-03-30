@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def main():
     methods = [
         part1,
@@ -15,14 +16,15 @@ def main():
         part3,
     ]
     for method in methods:
+        print(f'---===== {method.__name__} starting 🤔 =====---\n')
         try:
             method()
         except Exception as e:
             print(e)
             print(traceback.format_exc())
-            print(f'{method.__name__} done ❌')
+            print(f'\n---===== {method.__name__} done ❌=====---\n')
             continue
-        print(f'{method.__name__} done ✅')
+        print(f'\n---===== {method.__name__} done ✅ =====---\n')
 
 
 if __name__ == "__main__":

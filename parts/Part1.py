@@ -2,6 +2,8 @@ from clients.SqliteClient import SqlClient
 import pandas as pd
 from collections import Counter
 from efficient_apriori import apriori
+import json
+
 
 def part1():
     sql_client = SqlClient()
@@ -23,11 +25,21 @@ def part1():
     """
     df = pd.read_sql_query(query, sql_client.conn)
     # df[['name', 'height', 'weight', 'salary']] = df.apply(discretize, axis=1, result_type='expand')
-    df[['name', 'height', 'points', 'salary']] = df.apply(discretize, axis=1, result_type='expand')
+    df[['name', 'height', 'points', 'salary']] = df.apply(
+        discretize, axis=1, result_type='expand')
     print('Head of our data:')
     print(df.head(20))
     freq = find_freq(df)
-    association(df, freq)
+    _, top_5 = association(df, freq)
+    for rule in top_5:
+        count_1 = counts(rule, df)
+        support_1 = rule.support
+        support_2 = support(count_1)
+        conf_1 = rule.confidence
+        conf_2 = confidence(count_1)
+        print(support_1, support_2)
+        print(conf_1, conf_2)
+
 
 def association(df, freq):
     top_10 = [set(x[0]) for x in freq]
@@ -36,7 +48,8 @@ def association(df, freq):
     association_results = list(rules)
     # Print out every rule with 2 items on the left hand side,
     # 1 item on the right hand side, sorted by lift
-    rules_rhs = filter(lambda rule: len(rule.lhs) == 2 and len(rule.rhs) == 1 and set([*rule.lhs, *rule.rhs]) in top_10, rules)
+    rules_rhs = filter(lambda rule: len(rule.lhs) == 2 and len(
+        rule.rhs) == 1 and set([*rule.lhs, *rule.rhs]) in top_10, rules)
     print('Associations:')
     rules_rhs = sorted(rules_rhs, key=lambda rule: -rule.confidence)
     print("5 most high conf")
@@ -49,19 +62,52 @@ def association(df, freq):
     return association_results, top_5
 
 
-
-def supports(rule, df):
+def counts(rule, df):
     lhs = list(rule.lhs)
     rhs = list(rule.rhs)
-    for item in df:
-        pass
-    return
+    supports = {
+        '11': 0,
+        '01': 0,
+        '10': 0,
+        '00': 0
+    }
+    print(lhs)
+    print(rhs)
+    for item in df.iterrows():
+        item = list(item[1])
+        if all([x in item for x in lhs]) and all([x in item for x in rhs]):
+            supports['11'] += 1
+        elif all([x in item for x in lhs]) and not all([x in item for x in rhs]):
+            supports['10'] += 1
+        elif not all([x in item for x in lhs]) and all([x in item for x in rhs]):
+            supports['01'] += 1
+        if not all([x in item for x in lhs]) and not all([x in item for x in rhs]):
+            supports['00'] += 1
+
+    #supports = {key: value/len(df.index) for key, value in supports.items()}
+    return supports
+
+
+def support(val):
+    total = sum([x for x in val.values()])
+    return val['11']/total
+
+
+def confidence(val):
+    total = sum([x for x in val.values()])
+    return (val['11'])/(val['11'] + val['10'])
+
+
+def lift(rule):
+    return rule.lift
+
 
 def find_freq(df):
     ret = Counter([tuple(x[1:]) for x in df.to_numpy()]).most_common(10)
     print('Frequencies:')
     print(*ret, sep='\n')
     return ret
+
 
 def discretize(row):
     def map_height(val):
@@ -127,7 +173,6 @@ def discretize(row):
         if val < 50_000_000:
             return 's-11'
 
-
     return [
         row[0],
         map_height(row.height),
@@ -135,5 +180,3 @@ def discretize(row):
         map_points(row.points),
         map_salary(row.salary),
     ]
-
-
