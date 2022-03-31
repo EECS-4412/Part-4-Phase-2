@@ -3,6 +3,7 @@ import pandas as pd
 from collections import Counter
 from efficient_apriori import apriori
 import json
+from math import sqrt
 
 
 def part1():
@@ -31,14 +32,23 @@ def part1():
     print(df.head(20))
     freq = find_freq(df)
     _, top_5 = association(df, freq)
+    print(freq)
     for rule in top_5:
         count_1 = counts(rule, df)
         support_1 = rule.support
         support_2 = support(count_1)
         conf_1 = rule.confidence
         conf_2 = confidence(count_1)
-        print(support_1, support_2)
-        print(conf_1, conf_2)
+        print(f'Library Computed Support: {support_1}, Manually computed Support: {support_2}')
+        print(f'Library Computed Confidence: {conf_1}, Manually computed Confidence: {conf_2}')
+        
+        print(f'5 Interest Functions')
+        print(f'Interest: {interest(count_1) }')
+        print(f'Jaccard: { jaccard(count_1) }')
+        print(f'Cosine: { cosine(count_1) }')
+        print(f'Odds Ratio: { odds_ratio(count_1) }')
+        print(f'All Confidence: { all_confidence(count_1) }')
+
 
 
 def association(df, freq):
@@ -69,7 +79,12 @@ def counts(rule, df):
         '11': 0,
         '01': 0,
         '10': 0,
-        '00': 0
+        '00': 0,
+        '+1': 0,
+        '1+': 0,
+        '+0': 0,
+        '0+': 0,
+        'N': 0
     }
     print(lhs)
     print(rhs)
@@ -84,6 +99,12 @@ def counts(rule, df):
         if not all([x in item for x in lhs]) and not all([x in item for x in rhs]):
             supports['00'] += 1
 
+    supports['+1'] = supports['11'] + supports['01']
+    supports['1+'] = supports['11'] + supports['10']
+    supports['0+'] = supports['01'] + supports['00']
+    supports['+0'] = supports['10'] + supports['00']
+    supports['N'] = supports['11'] + supports['00'] + supports['10'] + supports['01']
+
     #supports = {key: value/len(df.index) for key, value in supports.items()}
     return supports
 
@@ -92,15 +113,31 @@ def support(val):
     total = sum([x for x in val.values()])
     return val['11']/total
 
-
 def confidence(val):
     total = sum([x for x in val.values()])
     return (val['11'])/(val['11'] + val['10'])
 
+# 5 interest functions
+
+def interest(val):
+    if (val['1+'] * val['+1']) == 0: return 'infinity'
+    return (val['N'] * val['11']) / (val['1+'] * val['+1'])
+
+def jaccard(val):
+    return val['11'] / (val['1+'] + val['+1'] + - val['11'])
+
+def cosine(val):
+    return (val['11']) / (val['1+'] * val['+1']) ** 1/2
+
+def odds_ratio(val):
+    if (val['10'] * val['01']) == 0: return 'infinity'
+    return (val['11'] * val['00']) / (val['10'] * val['01'])
+
+def all_confidence(val):
+    return min(val['11'] / val['1+'], val['11'] / val['+1'])
 
 def lift(rule):
     return rule.lift
-
 
 def find_freq(df):
     ret = Counter([tuple(x[1:]) for x in df.to_numpy()]).most_common(10)
