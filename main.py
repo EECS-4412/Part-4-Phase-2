@@ -11,8 +11,8 @@ load_dotenv()
 
 def main():
     methods = [
-        part1,
-        part2,
+        # part1,
+        # part2,
         part3,
     ]
     for method in methods:
@@ -22,7 +22,7 @@ def main():
         except Exception as e:
             print(e)
             print(traceback.format_exc())
-            print(f'\n---===== {method.__name__} done ❌=====---\n')
+            print(f'\n---===== {method.__name__} done ❌ =====---\n')
             continue
         print(f'\n---===== {method.__name__} done ✅ =====---\n')
 
