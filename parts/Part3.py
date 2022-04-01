@@ -35,7 +35,7 @@ def part3():
     estimators = [
         ("k_means_3", KMeans(n_clusters=3)),
         ("k_means_4", KMeans(n_clusters=4)),
-        ("k_means_`5`", KMeans(n_clusters=5)),
+        ("k_means_5", KMeans(n_clusters=5)),
     ]
 
     fignum = 1
@@ -90,10 +90,10 @@ def part3():
         plt.ylim([0.0, 1.0])
         plt.xlabel("False Positive Rate")
         plt.ylabel("True Positive Rate")
-        plt.title("Receiver operating characteristic example")
+        plt.title(f'ROC Curve for {name}')
         plt.legend(loc="lower right")
 
-        plt.savefig(f'./figures/{name}_part3.png')
+        plt.savefig(f'./figures/ROC_{name}_p3.png')
 
 def standardize(col):
     return StandardScaler().fit_transform(col)

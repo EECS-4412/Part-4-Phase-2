@@ -25,9 +25,11 @@ def part1():
         pa.DISPLAY_FIRST_LAST
     """
     df = pd.read_sql_query(query, sql_client.conn)
+    df.to_csv('figures/215494925-215528797-215659501-T1Old.csv')
     # df[['name', 'height', 'weight', 'salary']] = df.apply(discretize, axis=1, result_type='expand')
     df[['name', 'height', 'points', 'salary']] = df.apply(
         discretize, axis=1, result_type='expand')
+    df.to_csv('figures/215494925-215528797-215659501-T1Disc.csv')
     print('Head of our data:')
     print(df.head(20))
     freq = find_freq(df)

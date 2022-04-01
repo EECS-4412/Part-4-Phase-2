@@ -40,7 +40,7 @@ def part2():
     estimators = [
         ("k_means_3", KMeans(n_clusters=3)),
         ("k_means_4", KMeans(n_clusters=4)),
-        ("k_means_`5`", KMeans(n_clusters=5)),
+        ("k_means_5", KMeans(n_clusters=5)),
     ]
 
     fignum = 1
@@ -52,7 +52,7 @@ def part2():
         labels = est.labels_
         # TODO give actual label for each k-means in k_means_5
         df['label'] = labels
-        df.to_csv('./figures/215494925-215528797-215659501.csv')
+        df.to_csv('./figures/215494925-215528797-215659501T2Class.csv')
 
         fig = plt.figure(fignum, figsize=(12, 9))
         ax = Axes3D(fig, rect=[0, 0, 0.95, 1], elev=30, azim=134)
