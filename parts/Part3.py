@@ -6,6 +6,8 @@ import pandas as pd
 import numpy as np
 from sklearn.naive_bayes import GaussianNB
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 
 def part3():
     sql_client = SqlClient()
@@ -65,6 +67,33 @@ def part3():
 
         print(f'Number of mislabeled points out of a total {len(X_train)} points (on training) : {(y_train != y_pred_train).sum()}')
         print(f'Number of mislabeled points out of a total {len(X_test)} points (on testing) : {(y_test != y_pred).sum()}')
+
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in range(len(u_labels)):
+            fpr[i], tpr[i], _ = roc_curve(y_test, y_pred, pos_label=i)
+            roc_auc[i] = auc(fpr[i], tpr[i])
+            roc_auc["micro"] = auc(fpr[i], tpr[i]) 
+
+        plt.figure()
+        lw = 2
+        plt.plot(
+            fpr[2],
+            tpr[2],
+            color="darkorange",
+            lw=lw,
+            label="ROC curve (area = %0.2f)" % roc_auc[2],
+        )
+        plt.plot([0, 1], [0, 1], color="navy", lw=lw, linestyle="--")
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.0])
+        plt.xlabel("False Positive Rate")
+        plt.ylabel("True Positive Rate")
+        plt.title("Receiver operating characteristic example")
+        plt.legend(loc="lower right")
+
+        plt.savefig(f'./figures/{name}_part3.png')
 
 def standardize(col):
     return StandardScaler().fit_transform(col)
