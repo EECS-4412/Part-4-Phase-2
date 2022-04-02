@@ -49,15 +49,21 @@ def part2():
 
         label = est.fit_predict(x)
 
-        labels = est.labels_
         # TODO give actual label for each k-means in k_means_5
+        mapper = get_names(name)
+        m = lambda x: mapper[x]
+
+        label = np.vectorize(m)(label)
+        labels = np.vectorize(m)(est.labels_)
+
         df['label'] = labels
-        df.to_csv('./figures/215494925-215528797-215659501T2Class.csv')
+        df.to_csv('./figures/215494925-215528797-215659501-T2Class.csv')
 
         fig = plt.figure(fignum, figsize=(12, 9))
         ax = Axes3D(fig, rect=[0, 0, 0.95, 1], elev=30, azim=134)
 
         u_labels = np.unique(label)
+
         for i in u_labels:
             ax.scatter(x[label == i]['age'], x[label == i]['points'],
                        x[label == i]['salary'], label=i)
@@ -68,7 +74,7 @@ def part2():
         ax.set_title(name)
         ax.dist = 12
         fignum = fignum + 1
-        ax.figure.savefig('./figures/' + name + '.png')
+        ax.figure.savefig('./figures/Cluster_' + name + '.png')
 
         def animate(i):
             nonlocal ax
@@ -85,7 +91,7 @@ def part2():
 
         ani = FuncAnimation(fig, animate, frames=20,
                             interval=200, repeat=False)
-        ani.save('./figures/' + name + '.gif')
+        ani.save('./figures/Cluster_' + name + '.gif')
 
         print('\nSum of Squared Errors\t' + str(est.inertia_) +
               '\nCluster Centres:\n' + str(est.cluster_centers_) +
@@ -151,3 +157,22 @@ def discretize(row):
         map_points(row.points),
         map_salary(row.salary),
     ]
+
+def get_names(estimator_name):
+    mapper = {}
+    if estimator_name == 'k_means_3':
+        mapper[0] = 'Top Players'
+        mapper[1] = 'Older Players'
+        mapper[2] = 'Young Players'
+    elif estimator_name == 'k_means_4':
+        mapper[0] = 'Up and coming'
+        mapper[1] = 'Young Players'
+        mapper[2] = 'Top Players'
+        mapper[3] = 'Old Players'
+    elif estimator_name == 'k_means_5':
+        mapper[0] = 'Older, great'
+        mapper[1] = 'Star Player'
+        mapper[2] = 'Young, great'
+        mapper[3] = 'Young, average'
+        mapper[4] = 'Older, average'
+    return mapper
